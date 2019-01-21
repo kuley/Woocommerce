@@ -1,0 +1,29 @@
+// Store cart weight in the database
+add_action('woocommerce_checkout_update_order_meta', 'woo_add_cart_weight');
+function woo_add_cart_weight( $order_id ) {
+    global $woocommerce;
+    
+    $weight = $woocommerce->cart->cart_contents_weight;
+    update_post_meta( $order_id, '_cart_weight', $weight );
+}
+// Add order new column in administration
+add_filter( 'manage_edit-shop_order_columns', 'woo_order_weight_column', 20 );
+function woo_order_weight_column( $columns ) {
+	$offset = 8;
+	$updated_columns = array_slice( $columns, 0, $offset, true) +
+	array( 'total_weight' => esc_html__( 'Weight', 'woocommerce' ) ) +
+	array_slice($columns, $offset, NULL, true);
+	return $updated_columns;
+}
+// Populate weight column
+add_action( 'manage_shop_order_posts_custom_column', 'woo_custom_order_weight_column', 2 );
+function woo_custom_order_weight_column( $column ) {
+	global $post;
+ 
+	if ( $column == 'total_weight' ) {
+		$weight = get_post_meta( $post->ID, '_cart_weight', true );
+		if ( $weight > 0 )
+			print $weight . ' ' . esc_attr( get_option('woocommerce_weight_unit' ) );
+		else print 'N/A';
+	}
+}
