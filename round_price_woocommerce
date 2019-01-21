@@ -1,0 +1,9 @@
+add_filter( 'woocommerce_get_price_excluding_tax', 'round_price_product', 10, -1 );
+add_filter( 'woocommerce_get_price_including_tax', 'round_price_product', 10, -1 );
+add_filter( 'woocommerce_tax_round', 'round_price_product', 10, -1);
+add_filter( 'woocommerce_get_price', 'round_price_product', 10, -1);
+
+function round_price_product( $price ){
+    // Return rounded price
+    return round( $price, -1);
+}
